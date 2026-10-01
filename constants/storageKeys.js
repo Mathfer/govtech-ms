@@ -1,4 +1,8 @@
-export const STORAGE_KEYS = {
-  projects: 'govtech-ms-projects',
-  settings: 'govtech-ms-settings',
+export const storageKeys = {
+  SETTINGS: 'govtech:settings',
+  THEME: 'govtech:theme',
+  PROJECTS: 'govtech:projects',
+  TOKEN: 'govtech:token',
 }
+
+export const STORAGE_KEYS = storageKeys

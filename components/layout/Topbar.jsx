@@ -31,10 +31,10 @@ export default function Topbar({
 
         <div>
           <span className="breadcrumb">
-            GOVTECH PLATFORM <ChevronRight size={13} /> {active.toUpperCase()}
+            GOVTECH PLATFORM <ChevronRight size={13} /> {(active || 'Visão geral').toUpperCase()}
           </span>
 
-          <h1>{active}</h1>
+          <h1>{active || 'Visão geral'}</h1>
         </div>
       </div>
 

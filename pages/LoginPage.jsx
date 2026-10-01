@@ -29,8 +29,7 @@ export default function LoginPage() {
         <Brand />
 
         <nav className="public-nav">
-          <a href="#capabilities">Capacidades</a>
-          <a href="#standards">Frameworks</a>
+          <a href="landing#capabilities" className="nav-link">Capacidades</a>
 
           <a className="text-link" href="/dashboard">
             Ver demonstração <ArrowUpRight size={15} />
@@ -47,11 +46,11 @@ export default function LoginPage() {
             </div>
 
             <h1>
-              Governança de
+              Governança e
               <br />
-              <span className="accent-text">microsserviços</span>
+              <span className="accent-text"> monitoramento de</span>
               <br />
-              com controle total<span className="title-dot">.</span>
+              projetos de TI<span className="title-dot">.</span>
             </h1>
 
             <p className="hero-lead">
@@ -107,6 +106,9 @@ export default function LoginPage() {
                   <Eye size={17} />
                 </button>
               </div>
+
+              {/* Espaço entre senha e botão */}
+              <div style={{ height: '16px' }} />
 
               <button className="primary-button full-width" type="submit">
                 Entrar na Plataforma

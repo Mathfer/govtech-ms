@@ -158,7 +158,7 @@ export default function Sidebar({
                     color: 'white',
                     borderRadius: '5px',
                     transition: 'all 0.2s',
-                    marginLeft: '4px'
+                    marginLeft: '35px'
                   }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--color-primary-700, #0052A3)'
