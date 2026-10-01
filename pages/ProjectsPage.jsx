@@ -1,5 +1,4 @@
 import { CalendarClock, CircleAlert, FolderKanban, Plus, Users } from 'lucide-react'
-<<<<<<< HEAD
 import { useState, useEffect } from 'react'
 
 import DeleteProjectModal from '../components/projects/DeleteProjectModal'
@@ -10,54 +9,39 @@ import { normalizeProject } from '../utils/projectUtils'
 const projectsMock = [
   {
     id: 1,
-=======
-
-const projects = [
-  {
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
     name: 'Plataforma GovTech MS',
     owner: 'Marina Costa',
     deadline: '18 out. 2026',
     progress: 78,
     health: 'Saudável',
     status: 'success',
-<<<<<<< HEAD
     description: 'Sistema de governança e monitoramento de projetos de TI.',
     repositories: ['govtech-ms-frontend', 'govtech-ms-api'],
   },
   {
     id: 2,
-=======
-  },
-  {
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
     name: 'Portal de Indicadores',
     owner: 'Lucas Ferreira',
     deadline: '04 nov. 2026',
     progress: 56,
     health: 'Atenção',
     status: 'warning',
-<<<<<<< HEAD
     description: 'Dashboard de indicadores de desempenho e métricas.',
     repositories: ['portal-indicadores-web'],
   },
   {
     id: 3,
-=======
-  },
-  {
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
     name: 'Integração GitHub Actions',
     owner: 'Rafael Mendes',
     deadline: '12 out. 2026',
     progress: 42,
     health: 'Risco',
     status: 'danger',
-<<<<<<< HEAD
     description: 'Automação de CI/CD com GitHub Actions.',
     repositories: [],
   },
 ]
+
 export default function ProjectsPage({
   projectList = [],
   setProjectList,
@@ -81,6 +65,7 @@ export default function ProjectsPage({
   const safeProjects = Array.isArray(projectList) && projectList.length > 0
     ? projectList
     : []
+
   useEffect(() => {
     if (externalSelectedProject) {
       setSelectedProject(externalSelectedProject)
@@ -153,12 +138,6 @@ export default function ProjectsPage({
     setSelectedProject(project)
   }
 
-=======
-  },
-]
-
-export default function ProjectsPage() {
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
   return (
     <section className="dashboard-content">
       <div className="page-heading">
@@ -171,11 +150,7 @@ export default function ProjectsPage() {
           </p>
         </div>
 
-<<<<<<< HEAD
         <button type="button" className="primary-button" onClick={openCreateForm}>
-=======
-        <button type="button" className="primary-button">
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
           <Plus size={16} />
           Novo projeto
         </button>
@@ -184,37 +159,24 @@ export default function ProjectsPage() {
       <div className="dashboard-grid three-columns">
         <article className="metric-card elevation-1">
           <span>Projetos ativos</span>
-<<<<<<< HEAD
           <strong>{safeProjects.length}</strong>
-=======
-          <strong>12</strong>
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
           <small>Em acompanhamento</small>
         </article>
 
         <article className="metric-card elevation-1">
           <span>Em atenção</span>
-<<<<<<< HEAD
           <strong>{safeProjects.filter((p) => p.status === 'warning').length}</strong>
-=======
-          <strong>3</strong>
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
           <small>Exigem acompanhamento</small>
         </article>
 
         <article className="metric-card elevation-1">
           <span>Riscos críticos</span>
-<<<<<<< HEAD
           <strong>{safeProjects.filter((p) => p.status === 'danger').length}</strong>
-=======
-          <strong>1</strong>
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
           <small>Impacto potencial em prazo</small>
         </article>
       </div>
 
       <div className="project-grid">
-<<<<<<< HEAD
         {safeProjects.map((project) => (
           <article
             className="project-card elevation-1"
@@ -222,10 +184,6 @@ export default function ProjectsPage() {
             onClick={() => handleProjectClick(project)}
             style={{ cursor: 'pointer' }}
           >
-=======
-        {projects.map((project) => (
-          <article className="project-card elevation-1" key={project.name}>
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
             <div className="project-card-top">
               <div className="project-icon">
                 <FolderKanban size={19} />
@@ -270,7 +228,6 @@ export default function ProjectsPage() {
           </article>
         ))}
       </div>
-<<<<<<< HEAD
 
       {showForm && (
         <ProjectFormModal
@@ -299,8 +256,6 @@ export default function ProjectsPage() {
           onConfirm={deleteProject}
         />
       )}
-=======
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
     </section>
   )
 }

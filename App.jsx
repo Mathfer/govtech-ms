@@ -22,13 +22,10 @@ import LandingPage from './pages/LandingPage'
 import { defaultSettings } from './constants/defaultSettings'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { storageKeys } from './constants/storageKeys'
-<<<<<<< HEAD
 import { getStoredProjects } from './utils/storageUtils'
 import { projects as initialProjects } from './data/mockData'
 
 import { Check } from 'lucide-react'
-=======
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
 
 import './tokens.css'
 import './index.css'
@@ -57,22 +54,15 @@ function AuthenticatedLayout() {
   const [toastMessage, setToastMessage] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
-<<<<<<< HEAD
   const [isAuthenticated, setIsAuthenticated] = useState(true)
-=======
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
 
   const [settings, setSettings] = useLocalStorage(
     storageKeys.SETTINGS,
     defaultSettings,
   )
 
-<<<<<<< HEAD
   const [projectList, setProjectList] = useState(() => getStoredProjects(initialProjects))
 
-=======
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
   const activeSection =
     routeSections[location.pathname] || 'Visão geral'
 
@@ -88,10 +78,7 @@ function AuthenticatedLayout() {
       navigate(route)
     }
   }
-<<<<<<< HEAD
-  
-=======
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
+
   function handleSaveSettings(nextSettings) {
     setSettings((currentSettings) => ({
       ...currentSettings,
@@ -154,7 +141,6 @@ function AuthenticatedLayout() {
 
         {activeSection === 'Repositórios' && <RepositoriesPage />}
 
-<<<<<<< HEAD
         {activeSection === 'Projetos' && (
           <ProjectsPage
             projectList={projectList}
@@ -162,9 +148,6 @@ function AuthenticatedLayout() {
             onToast={handleToast}
           />
         )}
-=======
-        {activeSection === 'Projetos' && <ProjectsPage />}
->>>>>>> c599c2931f5a4d870eba29f9d05f53c130c7bf20
 
         {activeSection === 'Acessos e RBAC' && <RbacPage />}
 
