@@ -33,17 +33,7 @@ export default function DashboardLayout({
       />
 
       <div className="main-area">
-        <Topbar
-          active={active}
-          setOpen={setSidebarOpen}
-          onOpenSearch={() => {
-            setSearchOpen(true)
-            setAccountMenuOpen(false)
-          }}
-          accountMenuOpen={accountMenuOpen}
-          setAccountMenuOpen={setAccountMenuOpen}
-          onNavigate={navigateTo}
-        />
+        
 
         {children}
       </div>

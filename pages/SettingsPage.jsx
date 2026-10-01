@@ -43,12 +43,12 @@ export default function SettingsPage({
     })
   }, [settings])
 
-  const save = () => {
+  function save() {
     onSaveSettings(draft)
     onToast('Configurações salvas com sucesso.')
   }
 
-  const toggleNotification = (key) => {
+  function toggleNotification(key) {
     setDraft((current) => ({
       ...current,
       notifications: {
@@ -65,16 +65,82 @@ export default function SettingsPage({
     { id: 'seguranca', label: 'Segurança', icon: Shield },
   ]
 
+  const integrations = [
+    {
+      name: 'GitHub',
+      description: 'Sincronização de repositórios, PRs e commits.',
+      icon: GitFork,
+      connected: true,
+    },
+    {
+      name: 'SonarQube',
+      description: 'Análise de qualidade de código.',
+      icon: Code2,
+      connected: true,
+    },
+    {
+      name: 'Slack',
+      description: 'Notificações e alertas.',
+      icon: Bell,
+      connected: false,
+    },
+    {
+      name: 'Jira',
+      description: 'Issues, tarefas e sprints.',
+      icon: Target,
+      connected: false,
+    },
+  ]
+
+  const notifications = [
+    {
+      key: 'deploy',
+      label: 'Alertas de deploy',
+      description: 'Receba aviso quando um deploy for concluído.',
+    },
+    {
+      key: 'critical',
+      label: 'Erros críticos',
+      description: 'Alertas imediatos de falhas e pipelines.',
+    },
+    {
+      key: 'security',
+      label: 'Atualizações de segurança',
+      description: 'Avisos de riscos e vulnerabilidades.',
+    },
+    {
+      key: 'weekly',
+      label: 'Resumo semanal',
+      description: 'Relatório semanal de projetos e KPIs.',
+    },
+  ]
+
+  const securityItems = [
+    {
+      title: 'Autenticação em dois fatores (2FA)',
+      description: 'Adicione uma camada adicional de segurança.',
+      icon: LockKeyhole,
+      action: 'Ativar',
+    },
+    {
+      title: 'Sessões ativas',
+      description: 'Gerencie dispositivos conectados à conta.',
+      icon: Shield,
+      action: 'Ver 2 sessões',
+    },
+    {
+      title: 'Alterar senha',
+      description: 'Atualize sua senha periodicamente.',
+      icon: LockKeyhole,
+      action: 'Alterar',
+    },
+  ]
+
   return (
     <main className="dashboard-content">
       <div className="dashboard-intro">
         <div>
           <span className="eyebrow">ADMINISTRAÇÃO DO SISTEMA</span>
-
-          <h2>
-            Configurações<span className="title-dot">.</span>
-          </h2>
-
           <p>
             Personalize a plataforma, integre ferramentas e gerencie
             preferências.
@@ -86,8 +152,8 @@ export default function SettingsPage({
         <div
           className="section-tabs"
           style={{
-            borderBottom: 'none',
             padding: '0 16px',
+            borderBottom: 'none',
           }}
         >
           <div>
@@ -97,6 +163,7 @@ export default function SettingsPage({
               return (
                 <button
                   key={item.id}
+                  type="button"
                   className={tab === item.id ? 'active' : ''}
                   onClick={() => setTab(item.id)}
                 >
@@ -137,12 +204,12 @@ export default function SettingsPage({
                 <BriefcaseBusiness size={17} />
 
                 <input
-                  value={draft.organizationName}
+                  value={draft.organizationName || ''}
                   onChange={(event) =>
-                    setDraft({
-                      ...draft,
+                    setDraft((current) => ({
+                      ...current,
                       organizationName: event.target.value,
-                    })
+                    }))
                   }
                 />
               </div>
@@ -163,12 +230,12 @@ export default function SettingsPage({
                 <TimerReset size={17} />
 
                 <select
-                  value={draft.timezone}
+                  value={draft.timezone || 'America/Sao_Paulo'}
                   onChange={(event) =>
-                    setDraft({
-                      ...draft,
+                    setDraft((current) => ({
+                      ...current,
                       timezone: event.target.value,
-                    })
+                    }))
                   }
                   style={{
                     flex: 1,
@@ -180,9 +247,11 @@ export default function SettingsPage({
                   <option value="America/Sao_Paulo">
                     Brasília (UTC-3)
                   </option>
+
                   <option value="America/New_York">
                     New York (UTC-5)
                   </option>
+
                   <option value="Europe/London">
                     London (UTC+0)
                   </option>
@@ -201,7 +270,7 @@ export default function SettingsPage({
                 Tema
               </strong>
 
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {[
                   ['Claro', Sparkles],
                   ['Escuro', Eye],
@@ -209,16 +278,17 @@ export default function SettingsPage({
                 ].map(([theme, ThemeIcon]) => (
                   <button
                     key={theme}
+                    type="button"
                     className={
                       draft.theme === theme
                         ? 'primary-button small'
                         : 'secondary-button small'
                     }
                     onClick={() =>
-                      setDraft({
-                        ...draft,
+                      setDraft((current) => ({
+                        ...current,
                         theme,
-                      })
+                      }))
                     }
                   >
                     <ThemeIcon size={14} />
@@ -228,7 +298,11 @@ export default function SettingsPage({
               </div>
             </div>
 
-            <button className="primary-button" onClick={save}>
+            <button
+              type="button"
+              className="primary-button"
+              onClick={save}
+            >
               <Check size={16} />
               Salvar alterações
             </button>
@@ -243,51 +317,59 @@ export default function SettingsPage({
           </div>
 
           <div style={{ display: 'grid', gap: '12px' }}>
-            {[
-              ['GitHub', 'Sincronização de repositórios, PRs e commits.', GitFork, true],
-              ['SonarQube', 'Análise de qualidade de código.', Code2, true],
-              ['Slack', 'Notificações e alertas.', Bell, false],
-              ['Jira', 'Issues, tarefas e sprints.', Target, false],
-            ].map(([name, description, IntegrationIcon, connected]) => (
-              <article
-                key={name}
-                className="metric-card elevation-1"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '16px',
-                }}
-              >
-                <div className="metric-icon">
-                  <IntegrationIcon size={18} />
-                </div>
+            {integrations.map((integration) => {
+              const IntegrationIcon = integration.icon
 
-                <div style={{ flex: 1 }}>
-                  <strong>{name}</strong>
-
-                  <small
-                    style={{
-                      display: 'block',
-                      marginTop: '4px',
-                      color: 'var(--muted)',
-                    }}
-                  >
-                    {description}
-                  </small>
-                </div>
-
-                <StatusBadge status={connected ? 'success' : 'warning'}>
-                  {connected ? 'Conectado' : 'Desconectado'}
-                </StatusBadge>
-
-                <button
-                  className="secondary-button small"
-                  onClick={() => onToast(`${name}: ação demonstrativa.`)}
+              return (
+                <article
+                  key={integration.name}
+                  className="metric-card elevation-1"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                  }}
                 >
-                  {connected ? 'Configurar' : 'Conectar'}
-                </button>
-              </article>
-            ))}
+                  <div className="metric-icon">
+                    <IntegrationIcon size={18} />
+                  </div>
+
+                  <div style={{ flex: 1 }}>
+                    <h3>{integration.name}</h3>
+
+                    <small
+                      style={{
+                        display: 'block',
+                        marginTop: '4px',
+                        color: 'var(--muted)',
+                      }}
+                    >
+                      {integration.description}
+                    </small>
+                  </div>
+
+                  <StatusBadge
+                    status={integration.connected ? 'success' : 'warning'}
+                  >
+                    {integration.connected
+                      ? 'Conectado'
+                      : 'Desconectado'}
+                  </StatusBadge>
+
+                  <button
+                    type="button"
+                    className="secondary-button small"
+                    onClick={() =>
+                      onToast(
+                        `${integration.name}: ação demonstrativa.`,
+                      )
+                    }
+                  >
+                    {integration.connected ? 'Configurar' : 'Conectar'}
+                  </button>
+                </article>
+              )
+            })}
           </div>
         </section>
       )}
@@ -299,17 +381,14 @@ export default function SettingsPage({
           </div>
 
           <div style={{ display: 'grid', gap: '10px' }}>
-            {[
-              ['deploy', 'Alertas de deploy', 'Receba aviso quando um deploy for concluído.'],
-              ['critical', 'Erros críticos', 'Alertas imediatos de falhas e pipelines.'],
-              ['security', 'Atualizações de segurança', 'Avisos de riscos e vulnerabilidades.'],
-              ['weekly', 'Resumo semanal', 'Relatório semanal de projetos e KPIs.'],
-            ].map(([key, label, description]) => {
-              const enabled = draft.notifications[key]
+            {notifications.map((notification) => {
+              const enabled = Boolean(
+                draft.notifications?.[notification.key],
+              )
 
               return (
                 <article
-                  key={key}
+                  key={notification.key}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -319,23 +398,28 @@ export default function SettingsPage({
                   }}
                 >
                   <div style={{ flex: 1 }}>
-                    <strong
+                    <h3
                       style={{
                         display: 'block',
                         fontSize: '14px',
                       }}
                     >
-                      {label}
-                    </strong>
+                      {notification.label}
+                    </h3>
 
                     <small style={{ color: 'var(--muted)' }}>
-                      {description}
+                      {notification.description}
                     </small>
                   </div>
 
                   <button
                     type="button"
-                    onClick={() => toggleNotification(key)}
+                    onClick={() => toggleNotification(notification.key)}
+                    aria-label={
+                      enabled
+                        ? `Desativar ${notification.label}`
+                        : `Ativar ${notification.label}`
+                    }
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -348,6 +432,8 @@ export default function SettingsPage({
                       background: enabled
                         ? 'var(--color-primary-500)'
                         : 'var(--border)',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s ease',
                     }}
                   >
                     <span
@@ -355,8 +441,9 @@ export default function SettingsPage({
                         display: 'block',
                         width: '18px',
                         height: '18px',
-                        borderRadius: '50%',
                         background: '#fff',
+                        borderRadius: '50%',
+                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.16)',
                       }}
                     />
                   </button>
@@ -366,6 +453,7 @@ export default function SettingsPage({
           </div>
 
           <button
+            type="button"
             className="primary-button"
             style={{ marginTop: '20px' }}
             onClick={save}
@@ -383,46 +471,49 @@ export default function SettingsPage({
           </div>
 
           <div style={{ display: 'grid', gap: '14px' }}>
-            {[
-              ['Autenticação em dois fatores (2FA)', 'Adicione uma camada adicional de segurança.', LockKeyhole, 'Ativar'],
-              ['Sessões ativas', 'Gerencie dispositivos conectados à conta.', Shield, 'Ver 2 sessões'],
-              ['Alterar senha', 'Atualize sua senha periodicamente.', LockKeyhole, 'Alterar'],
-            ].map(([title, description, SecurityIcon, action]) => (
-              <article
-                key={title}
-                className="metric-card elevation-1"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '16px',
-                }}
-              >
-                <div className="metric-icon">
-                  <SecurityIcon size={18} />
-                </div>
+            {securityItems.map((item) => {
+              const SecurityIcon = item.icon
 
-                <div style={{ flex: 1 }}>
-                  <strong>{title}</strong>
-
-                  <small
-                    style={{
-                      display: 'block',
-                      marginTop: '4px',
-                      color: 'var(--muted)',
-                    }}
-                  >
-                    {description}
-                  </small>
-                </div>
-
-                <button
-                  className="secondary-button small"
-                  onClick={() => onToast(`${action}: ação demonstrativa.`)}
+              return (
+                <article
+                  key={item.title}
+                  className="metric-card elevation-1"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                  }}
                 >
-                  {action}
-                </button>
-              </article>
-            ))}
+                  <div className="metric-icon">
+                    <SecurityIcon size={18} />
+                  </div>
+
+                  <div style={{ flex: 1 }}>
+                    <h3>{item.title}</h3>
+
+                    <small
+                      style={{
+                        display: 'block',
+                        marginTop: '4px',
+                        color: 'var(--muted)',
+                      }}
+                    >
+                      {item.description}
+                    </small>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="secondary-button small"
+                    onClick={() =>
+                      onToast(`${item.action}: ação demonstrativa.`)
+                    }
+                  >
+                    {item.action}
+                  </button>
+                </article>
+              )
+            })}
           </div>
         </section>
       )}

@@ -1,9 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
 
 import Sidebar from './components/layout/Sidebar'
 import Topbar from './components/layout/Topbar'
 import GlobalSearch from './components/layout/GlobalSearch'
-
+import AuditPage from './pages/AuditPage'
+import RepositoriesPage from './pages/RepositoriesPage'
+import ProjectsPage from './pages/ProjectsPage'
+import RbacPage from './pages/RbacPage'
+import SettingsPage from './pages/SettingsPage'
 import DashboardPage from './pages/DashboardPage'
 import LoginPage from './pages/LoginPage'
 import LandingPage from './pages/LandingPage'
@@ -15,45 +26,81 @@ import { storageKeys } from './constants/storageKeys'
 import './tokens.css'
 import './index.css'
 
-export default function App() {
+const routeSections = {
+  '/dashboard': 'Visão geral',
+  '/audit': 'Auditoria',
+  '/repositories': 'Repositórios',
+  '/projects': 'Projetos',
+  '/access': 'Acessos e RBAC',
+  '/settings': 'Configurações',
+}
+
+const sectionRoutes = {
+  'Visão geral': '/dashboard',
+  Auditoria: '/audit',
+  Repositórios: '/repositories',
+  Projetos: '/projects',
+  'Acessos e RBAC': '/access',
+  Configurações: '/settings',
+}
+
+function AuthenticatedLayout() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [toastMessage, setToastMessage] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState('Visão geral')
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
   const [settings, setSettings] = useLocalStorage(
     storageKeys.SETTINGS,
-    defaultSettings
+    defaultSettings,
   )
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [currentRoute, setCurrentRoute] = useState(window.location.pathname)
+  const activeSection =
+    routeSections[location.pathname] || 'Visão geral'
 
-  // Detecta mudança de rota
   useEffect(() => {
-    const handleLocation = () => {
-      setCurrentRoute(window.location.pathname)
+    setSidebarOpen(false)
+    setAccountMenuOpen(false)
+  }, [location.pathname])
+
+  function handleNavigate(section) {
+    const route = sectionRoutes[section]
+
+    if (route) {
+      navigate(route)
     }
-    
-    window.addEventListener('popstate', handleLocation)
-    handleLocation()
-    
-    return () => window.removeEventListener('popstate', handleLocation)
-  }, [])
+  }
+  function handleSaveSettings(nextSettings) {
+    setSettings((currentSettings) => ({
+      ...currentSettings,
+      ...nextSettings,
+      notifications: {
+        ...currentSettings.notifications,
+        ...nextSettings.notifications,
+      },
+    }))
 
-  // Rota de login (raiz e /login)
-  if (currentRoute === '/' || currentRoute === '/login' || currentRoute === '') {
-    return <LoginPage />
+    if (nextSettings.theme) {
+      document.documentElement.dataset.theme =
+        nextSettings.theme === 'Escuro' ? 'dark' : 'light'
+    }
   }
 
-  // Rota da landing page
-  if (currentRoute === '/landing') {
-    return <LandingPage />
+  function handleToast(message) {
+    setToastMessage(message)
+
+    window.setTimeout(() => {
+      setToastMessage('')
+    }, 3000)
   }
 
-  // Dashboard e outras rotas
   return (
     <div className="app-layout">
       <Sidebar
         active={activeSection}
-        setActive={setActiveSection}
+        onNavigate={handleNavigate}
         open={sidebarOpen}
         setOpen={setSidebarOpen}
         settings={settings}
@@ -61,19 +108,85 @@ export default function App() {
       />
 
       <div className="main-content">
-        
+        <Topbar
+          active={activeSection}
+          setOpen={setSidebarOpen}
+          onOpenSearch={() => { }}
+          accountMenuOpen={accountMenuOpen}
+          setAccountMenuOpen={setAccountMenuOpen}
+          onNavigate={handleNavigate}
+        />
 
         <GlobalSearch />
 
-        <DashboardPage
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-          settings={settings}
-          setSettings={setSettings}
-          isAuthenticated={isAuthenticated}
-          setIsAuthenticated={setIsAuthenticated}
-        />
+        {activeSection === 'Visão geral' && (
+          <DashboardPage
+            activeSection={activeSection}
+            setActiveSection={handleNavigate}
+            settings={settings}
+            setSettings={setSettings}
+            isAuthenticated={isAuthenticated}
+            setIsAuthenticated={setIsAuthenticated}
+          />
+        )}
+
+        {activeSection === 'Auditoria' && <AuditPage />}
+
+        {activeSection === 'Repositórios' && <RepositoriesPage />}
+
+        {activeSection === 'Projetos' && <ProjectsPage />}
+
+        {activeSection === 'Acessos e RBAC' && <RbacPage />}
+
+        {activeSection === 'Configurações' && (
+          <SettingsPage
+            settings={settings}
+            onSaveSettings={handleSaveSettings}
+            onToast={handleToast}
+          />
+        )}
       </div>
+      {toastMessage && (
+        <div
+          className="elevation-3"
+          style={{
+            position: 'fixed',
+            right: '24px',
+            bottom: '24px',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '14px 16px',
+            color: 'var(--text-primary)',
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '10px',
+          }}
+        >
+          <Check size={17} color="var(--color-success)" />
+          {toastMessage}
+        </div>
+      )}
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<LoginPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/landing" element={<LandingPage />} />
+
+      <Route path="/dashboard" element={<AuthenticatedLayout />} />
+      <Route path="/audit" element={<AuthenticatedLayout />} />
+      <Route path="/repositories" element={<AuthenticatedLayout />} />
+      <Route path="/projects" element={<AuthenticatedLayout />} />
+      <Route path="/access" element={<AuthenticatedLayout />} />
+      <Route path="/settings" element={<AuthenticatedLayout />} />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }

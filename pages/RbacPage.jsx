@@ -4,7 +4,6 @@ import {
   Shield,
   UserRound,
   Users,
-  X,
 } from 'lucide-react'
 
 import RoleDetailModal from '../components/rbac/RoleDetailModal'
@@ -58,22 +57,18 @@ export default function RbacPage() {
     <main className="dashboard-content">
       <div className="dashboard-intro">
         <div>
-          <span className="eyebrow">RF08 — CONTROLE DE ACESSO</span>
-
-          <h2>
-            Usuários e Permissões<span className="title-dot">.</span>
-          </h2>
+          <span className="eyebrow">CONTROLE DE ACESSO</span>
 
           <p>Gerencie papéis, permissões e acesso baseado em funções.</p>
         </div>
 
         <div className="intro-actions">
-          <button className="secondary-button">
+          <button type="button" className="secondary-button">
             <Users size={16} />
             Convidar usuário
           </button>
 
-          <button className="primary-button">
+          <button type="button" className="primary-button">
             <Shield size={16} />
             Nova função
           </button>
@@ -95,20 +90,21 @@ export default function RbacPage() {
           {accessRoles.map((role) => (
             <button
               key={role.label}
+              type="button"
               className="metric-card elevation-1"
               onClick={() => setSelectedRole(role)}
               style={{
-                border:
-                  selectedRole?.label === role.label
-                    ? '2px solid var(--color-primary-500)'
-                    : '1px solid transparent',
-                background: 'var(--surface)',
-                textAlign: 'left',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
                 minHeight: '80px',
                 padding: '16px',
+                background: 'var(--surface)',
+                border:
+                  selectedRole?.label === role.label
+                    ? '2px solid var(--color-primary-500)'
+                    : '1px solid transparent',
+                textAlign: 'left',
               }}
             >
               <div className="metric-icon" style={{ flexShrink: 0 }}>
@@ -116,11 +112,13 @@ export default function RbacPage() {
               </div>
 
               <div className="metric-content">
-                <strong style={{
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  lineHeight: '1.3'
-                }}>
+                <strong
+                  style={{
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    lineHeight: '1.3',
+                  }}
+                >
                   {role.label}
                 </strong>
               </div>
@@ -137,12 +135,12 @@ export default function RbacPage() {
           </div>
 
           <div className="panel-actions">
-            <button className="secondary-button">
+            <button type="button" className="secondary-button">
               <Search size={15} />
               Filtrar
             </button>
 
-            <button className="primary-button small">
+            <button type="button" className="primary-button small">
               <UserRound size={14} />
               Adicionar
             </button>
@@ -178,14 +176,20 @@ export default function RbacPage() {
                   <td className="mono">{user.email}</td>
 
                   <td>
-                    <StatusBadge status="success">{user.role}</StatusBadge>
+                    <StatusBadge status="success">
+                      {user.role}
+                    </StatusBadge>
                   </td>
 
                   <td>{user.team}</td>
 
                   <td>
                     <StatusBadge
-                      status={user.status === 'Ativo' ? 'success' : 'warning'}
+                      status={
+                        user.status === 'Ativo'
+                          ? 'success'
+                          : 'warning'
+                      }
                     >
                       {user.status}
                     </StatusBadge>

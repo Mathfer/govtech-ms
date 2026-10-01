@@ -630,8 +630,9 @@ p {
 ========================================== */
 
 .dashboard-shell {
-  min-height: 100vh;
+  min-height: 50vh;
   background: var(--color-background);
+  display: flex;
 }
 
 .sidebar {
@@ -1698,10 +1699,6 @@ p {
     background: var(--color-overlay);
   }
 
-  .main-area {
-    margin-left: 0;
-  }
-
   .topbar {
     height: 72px;
     padding: 0 16px;
@@ -1874,5 +1871,64 @@ p {
 
   .intro-actions .primary-button {
     width: 100%;
+  }
+}
+/* =========================================================
+   Cards de métricas — lado a lado
+   ========================================================= */
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.metrics-grid .metric-card {
+  min-width: 0;
+}
+
+/* Tablet: mantém 2 cards por linha */
+@media (max-width: 1024px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Celular: 1 card por linha */
+@media (max-width: 640px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* =========================================================
+   PADRÃO DE ESPAÇAMENTO — páginas internas
+   Usa a Visão geral como referência
+   ========================================================= */
+
+.dashboard-content,
+.page-content {
+  width: 100%;
+  min-width: 0;
+  padding: 28px;
+}
+
+/* Evita margem padrão inesperada entre as páginas */
+.dashboard-content > :first-child,
+.page-content > :first-child {
+  margin-top: 0;
+}
+
+.dashboard-content > :last-child,
+.page-content > :last-child {
+  margin-bottom: 0;
+}
+
+/* Mantém o mesmo respiro em telas menores */
+@media (max-width: 768px) {
+  .dashboard-content,
+  .page-content {
+    padding: 20px 16px;
   }
 }

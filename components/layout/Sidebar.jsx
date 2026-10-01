@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   ChevronDown,
   ChevronRight,
@@ -15,40 +16,81 @@ import Icon from '../common/Icon'
 import ChatbotModal from '../common/ChatbotModal'
 import { auditEvents, profile } from '../../data/mockData'
 
+const menuItems = [
+  {
+    label: 'Visão geral',
+    icon: 'BarChart3',
+    path: '/dashboard',
+  },
+  {
+    label: 'Auditoria',
+    icon: 'LockKeyhole',
+    path: '/audit',
+  },
+  {
+    label: 'Repositórios',
+    icon: 'GitBranch',
+    path: '/repositories',
+  },
+  {
+    label: 'Projetos',
+    icon: 'Target',
+    path: '/projects',
+  },
+]
+
+const adminItems = [
+  {
+    label: 'Acessos e RBAC',
+    icon: 'Users',
+    path: '/access',
+  },
+  {
+    label: 'Configurações',
+    icon: 'Settings2',
+    path: '/settings',
+  },
+]
+
+const workspaces = [
+  { id: 1, name: 'govtech-platform', logo: 'G' },
+  { id: 2, name: 'govtech-ms', logo: 'M' },
+  { id: 3, name: 'govtech-ti', logo: 'T' },
+]
+
 export default function Sidebar({
-  active,
-  setActive,
   open,
   setOpen,
   settings,
   setSettings,
 }) {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const [showChatbot, setShowChatbot] = useState(false)
   const [showWorkspaceMenu, setShowWorkspaceMenu] = useState(false)
 
-  const menuItems = [
-    { label: 'Visão geral', icon: 'BarChart3' },
-    { label: 'Auditoria', icon: 'LockKeyhole' },
-    { label: 'Repositórios', icon: 'GitBranch' },
-    { label: 'Projetos', icon: 'Target' },
-  ]
+  const selectedWorkspace =
+    workspaces.find(
+      (workspace) => workspace.name === settings?.organizationName,
+    ) || workspaces[0]
 
-  const workspaces = [
-    { id: 1, name: 'govtech-platform', logo: 'G' },
-    { id: 2, name: 'govtech-ms', logo: 'M' },
-    { id: 3, name: 'govtech-ti', logo: 'T' },
-  ]
-
-  const navigate = (page) => {
-    setActive(page)
-    setOpen(false)
+  function isActive(path) {
+    return location.pathname === path
   }
 
-  const handleWorkspaceSelect = (workspace) => {
-    setSettings(prev => ({
-      ...prev,
-      organizationName: workspace.name
+  function handleNavigate(path) {
+    navigate(path)
+    setOpen(false)
+    setShowWorkspaceMenu(false)
+  }
+
+  function handleWorkspaceSelect(workspace) {
+    setSettings((previousSettings) => ({
+      ...previousSettings,
+      organizationName: workspace.name,
     }))
+
     setShowWorkspaceMenu(false)
   }
 
@@ -59,6 +101,7 @@ export default function Sidebar({
           <Brand compact />
 
           <button
+            type="button"
             className="icon-button sidebar-close"
             onClick={() => setOpen(false)}
             aria-label="Fechar navegação"
@@ -69,9 +112,9 @@ export default function Sidebar({
 
         {/* Workspace Switcher */}
         <div className="workspace-switch">
-          {/* Botão do Workspace - Só aparece quando menu está fechado */}
           {!showWorkspaceMenu && (
             <button
+              type="button"
               onClick={() => setShowWorkspaceMenu(true)}
               style={{
                 width: '100%',
@@ -84,35 +127,57 @@ export default function Sidebar({
                 borderRadius: '6px',
                 cursor: 'pointer',
                 textAlign: 'left',
-                transition: 'background-color 0.2s'
+                transition: 'background-color 0.2s',
               }}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary, #f5f5f5)'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              onMouseOver={(event) => {
+                event.currentTarget.style.backgroundColor =
+                  'var(--bg-secondary, #f5f5f5)'
+              }}
+              onMouseOut={(event) => {
+                event.currentTarget.style.backgroundColor = 'transparent'
+              }}
             >
               <span
                 style={{
                   width: '28px',
                   height: '28px',
                   borderRadius: '5px',
-                  backgroundColor: 'var(--color-primary-600, #0066CC)',
+                  backgroundColor: 'var(--color-primary-600, #7A58C4)',
                   color: 'white',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: '13px',
                   fontWeight: '600',
-                  flexShrink: 0
+                  flexShrink: 0,
                 }}
               >
-                {workspaces.find(w => w.name === settings.organizationName)?.logo || 'G'}
+                {selectedWorkspace.logo}
               </span>
 
               <span style={{ flex: 1 }}>
-                <small style={{ display: 'block', fontSize: '9px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '1px', letterSpacing: '0.3px' }}>
+                <small
+                  style={{
+                    display: 'block',
+                    fontSize: '9px',
+                    fontWeight: '700',
+                    color: 'var(--text-primary)',
+                    marginBottom: '1px',
+                    letterSpacing: '0.3px',
+                  }}
+                >
                   WORKSPACE
                 </small>
-                <b style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>
-                  {settings.organizationName || 'govtech-platform'}
+
+                <b
+                  style={{
+                    display: 'block',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  {selectedWorkspace.name}
                 </b>
               </span>
 
@@ -120,10 +185,8 @@ export default function Sidebar({
             </button>
           )}
 
-          {/* Menu de Seleção - Só aparece quando aberto */}
           {showWorkspaceMenu && (
             <div>
-              {/* Header com título e botão de fechar */}
               <div
                 style={{
                   display: 'flex',
@@ -131,129 +194,159 @@ export default function Sidebar({
                   justifyContent: 'space-between',
                   marginBottom: '12px',
                   paddingBottom: '10px',
+                  paddingRight: '4px',
                   borderBottom: '1px solid var(--border, #e5e7eb)',
-                  paddingRight: '4px'
                 }}
               >
-                <span style={{
-                  fontSize: '9px',
-                  fontWeight: '700',
-                  color: 'var(--text-primary)',
-                  letterSpacing: '0.5px',
-                  textTransform: 'uppercase'
-                }}>
-                  SELECIONE O WORKSPACE
+                <span
+                  style={{
+                    fontSize: '9px',
+                    fontWeight: '700',
+                    color: 'var(--text-primary)',
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Selecione o workspace
                 </span>
 
                 <button
+                  type="button"
                   onClick={() => setShowWorkspaceMenu(false)}
+                  aria-label="Fechar seleção de workspace"
                   style={{
-                    background: 'var(--color-primary-600, #0066CC)',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '5px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    marginLeft: '35px',
+                    padding: '5px',
                     color: 'white',
+                    background: 'var(--color-primary-600, #7A58C4)',
+                    border: 'none',
                     borderRadius: '5px',
+                    cursor: 'pointer',
                     transition: 'all 0.2s',
-                    marginLeft: '35px'
                   }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-primary-700, #0052A3)'
-                    e.currentTarget.style.transform = 'scale(1.05)'
+                  onMouseOver={(event) => {
+                    event.currentTarget.style.backgroundColor =
+                      'var(--color-primary-700, #5F429D)'
+                    event.currentTarget.style.transform = 'scale(1.05)'
                   }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-primary-600, #0066CC)'
-                    e.currentTarget.style.transform = 'scale(1)'
+                  onMouseOut={(event) => {
+                    event.currentTarget.style.backgroundColor =
+                      'var(--color-primary-600, #7A58C4)'
+                    event.currentTarget.style.transform = 'scale(1)'
                   }}
                 >
                   <X size={14} strokeWidth={2.5} />
                 </button>
               </div>
 
-              {/* Lista de workspaces */}
-              {workspaces.map((workspace) => (
-                <button
-                  key={workspace.id}
-                  onClick={() => handleWorkspaceSelect(workspace)}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '8px 10px',
-                    backgroundColor: settings.organizationName === workspace.name ? 'var(--surface, white)' : 'transparent',
-                    border: '1px solid transparent',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    transition: 'all 0.2s',
-                    marginBottom: '4px'
-                  }}
-                  onMouseOver={(e) => {
-                    if (settings.organizationName !== workspace.name) {
-                      e.currentTarget.style.backgroundColor = 'var(--surface, white)'
-                      e.currentTarget.style.borderColor = 'var(--border, #e5e7eb)'
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    if (settings.organizationName !== workspace.name) {
-                      e.currentTarget.style.backgroundColor = 'transparent'
-                      e.currentTarget.style.borderColor = 'transparent'
-                    }
-                  }}
-                >
-                  <span
+              {workspaces.map((workspace) => {
+                const selected =
+                  selectedWorkspace.name === workspace.name
+
+                return (
+                  <button
+                    key={workspace.id}
+                    type="button"
+                    onClick={() => handleWorkspaceSelect(workspace)}
                     style={{
-                      width: '26px',
-                      height: '26px',
-                      borderRadius: '5px',
-                      backgroundColor: settings.organizationName === workspace.name
-                        ? 'var(--color-primary-600, #0066CC)'
-                        : 'var(--bg-tertiary, #e5e7eb)',
-                      color: settings.organizationName === workspace.name ? 'white' : 'var(--text-secondary)',
+                      width: '100%',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '11px',
-                      fontWeight: '600',
-                      flexShrink: 0
+                      gap: '10px',
+                      marginBottom: '4px',
+                      padding: '8px 10px',
+                      backgroundColor: selected
+                        ? 'var(--surface, white)'
+                        : 'transparent',
+                      border: '1px solid transparent',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseOver={(event) => {
+                      if (!selected) {
+                        event.currentTarget.style.backgroundColor =
+                          'var(--surface, white)'
+                        event.currentTarget.style.borderColor =
+                          'var(--border, #e5e7eb)'
+                      }
+                    }}
+                    onMouseOut={(event) => {
+                      if (!selected) {
+                        event.currentTarget.style.backgroundColor =
+                          'transparent'
+                        event.currentTarget.style.borderColor =
+                          'transparent'
+                      }
                     }}
                   >
-                    {workspace.logo}
-                  </span>
+                    <span
+                      style={{
+                        width: '26px',
+                        height: '26px',
+                        borderRadius: '5px',
+                        backgroundColor: selected
+                          ? 'var(--color-primary-600, #7A58C4)'
+                          : 'var(--bg-tertiary, #e5e7eb)',
+                        color: selected
+                          ? 'white'
+                          : 'var(--text-secondary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {workspace.logo}
+                    </span>
 
-                  <span style={{
-                    flex: 1,
-                    fontWeight: settings.organizationName === workspace.name ? '600' : '500',
-                    color: settings.organizationName === workspace.name ? 'var(--text-primary)' : 'var(--text-secondary)',
-                    fontSize: '12px'
-                  }}>
-                    {workspace.name}
-                  </span>
+                    <span
+                      style={{
+                        flex: 1,
+                        color: selected
+                          ? 'var(--text-primary)'
+                          : 'var(--text-secondary)',
+                        fontSize: '12px',
+                        fontWeight: selected ? '600' : '500',
+                      }}
+                    >
+                      {workspace.name}
+                    </span>
 
-                  {settings.organizationName === workspace.name && (
-                    <Check size={15} strokeWidth={2.5} color="var(--color-primary-600, #0066CC)" />
-                  )}
-                </button>
-              ))}
+                    {selected && (
+                      <Check
+                        size={15}
+                        strokeWidth={2.5}
+                        color="var(--color-primary-600, #7A58C4)"
+                      />
+                    )}
+                  </button>
+                )
+              })}
             </div>
           )}
         </div>
 
+        {/* Navegação */}
         <nav className="side-nav">
           <span className="nav-label">OBSERVABILIDADE</span>
 
           {menuItems.map((item) => (
             <button
               key={item.label}
-              className={active === item.label ? 'active' : ''}
-              onClick={() => navigate(item.label)}
+              type="button"
+              className={isActive(item.path) ? 'active' : ''}
+              onClick={() => handleNavigate(item.path)}
             >
               <Icon name={item.icon} size={18} />
-              {item.label}
+
+              <span>{item.label}</span>
 
               {item.label === 'Auditoria' && (
                 <span className="nav-count">{auditEvents.length}</span>
@@ -261,28 +354,31 @@ export default function Sidebar({
             </button>
           ))}
 
-          <span className="nav-label nav-label-spaced">ADMINISTRAÇÃO</span>
+          <span className="nav-label nav-label-spaced">
+            ADMINISTRAÇÃO
+          </span>
 
-          <button
-            className={active === 'Acessos e RBAC' ? 'active' : ''}
-            onClick={() => navigate('Acessos e RBAC')}
-          >
-            <Users size={18} />
-            Acessos e RBAC
-          </button>
+          {adminItems.map((item) => (
+            <button
+              key={item.label}
+              type="button"
+              className={isActive(item.path) ? 'active' : ''}
+              onClick={() => handleNavigate(item.path)}
+            >
+              {item.icon === 'Users' ? (
+                <Users size={18} />
+              ) : (
+                <Settings2 size={18} />
+              )}
 
-          <button
-            className={active === 'Configurações' ? 'active' : ''}
-            onClick={() => navigate('Configurações')}
-          >
-            <Settings2 size={18} />
-            Configurações
-          </button>
+              <span>{item.label}</span>
+            </button>
+          ))}
         </nav>
 
         <div className="sidebar-bottom">
-          {/* Botão de Ajuda com Chatbot */}
           <button
+            type="button"
             className="support-card"
             onClick={() => setShowChatbot(true)}
             style={{
@@ -290,7 +386,7 @@ export default function Sidebar({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              textAlign: 'left'
+              textAlign: 'left',
             }}
           >
             <Sparkles size={17} />
@@ -316,13 +412,13 @@ export default function Sidebar({
 
       {open && (
         <button
+          type="button"
           className="sidebar-overlay"
           onClick={() => setOpen(false)}
           aria-label="Fechar menu"
         />
       )}
 
-      {/* Modal do Chatbot */}
       {showChatbot && (
         <ChatbotModal onClose={() => setShowChatbot(false)} />
       )}

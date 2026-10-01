@@ -1,186 +1,118 @@
-import { useEffect, useState } from 'react'
-import { Plus, Target } from 'lucide-react'
+import { CalendarClock, CircleAlert, FolderKanban, Plus, Users } from 'lucide-react'
 
-import ProjectCard from '../components/projects/ProjectCard'
-import DeleteProjectModal from '../components/projects/DeleteProjectModal'
-import ProjectDetailModal from '../components/projects/ProjectDetailModal'
-import ProjectFormModal from '../components/projects/ProjectFormModal'
-import { normalizeProject } from '../utils/projectUtils'
+const projects = [
+  {
+    name: 'Plataforma GovTech MS',
+    owner: 'Marina Costa',
+    deadline: '18 out. 2026',
+    progress: 78,
+    health: 'Saudável',
+    status: 'success',
+  },
+  {
+    name: 'Portal de Indicadores',
+    owner: 'Lucas Ferreira',
+    deadline: '04 nov. 2026',
+    progress: 56,
+    health: 'Atenção',
+    status: 'warning',
+  },
+  {
+    name: 'Integração GitHub Actions',
+    owner: 'Rafael Mendes',
+    deadline: '12 out. 2026',
+    progress: 42,
+    health: 'Risco',
+    status: 'danger',
+  },
+]
 
-export default function ProjectsPage({
-  projectList = [],
-  setProjectList,
-  onToast,
-  externalSelectedProject,
-  onClearExternalSelectedProject,
-}) {
-  const [showForm, setShowForm] = useState(false)
-  const [selectedProject, setSelectedProject] = useState(null)
-  const [editingProject, setEditingProject] = useState(null)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-
-  const safeProjects = Array.isArray(projectList) ? projectList : []
-
-  useEffect(() => {
-    if (externalSelectedProject) {
-      setSelectedProject(externalSelectedProject)
-      onClearExternalSelectedProject()
-    }
-  }, [externalSelectedProject, onClearExternalSelectedProject])
-
-  const openCreateForm = () => {
-    setEditingProject(null)
-    setShowForm(true)
-  }
-
-  const openEditForm = (project) => {
-    setSelectedProject(null)
-    setEditingProject(project)
-    setShowForm(true)
-  }
-
-  const saveProject = (formData) => {
-    if (editingProject) {
-      setProjectList((current) =>
-        current.map((project) =>
-          project.id === editingProject.id
-            ? normalizeProject({
-                ...project,
-                ...formData,
-              })
-            : project
-        )
-      )
-
-      onToast('Projeto atualizado com sucesso.')
-    } else {
-      setProjectList((current) => [
-        ...current,
-        normalizeProject({
-          id: Date.now(),
-          ...formData,
-        }),
-      ])
-
-      onToast('Projeto criado com sucesso.')
-    }
-
-    setShowForm(false)
-    setEditingProject(null)
-  }
-
-  const deleteProject = () => {
-    if (!selectedProject) return
-
-    setProjectList((current) =>
-      current.filter((project) => project.id !== selectedProject.id)
-    )
-
-    setSelectedProject(null)
-    setShowDeleteConfirm(false)
-    onToast('Projeto excluído com sucesso.', 'warning')
-  }
-
+export default function ProjectsPage() {
   return (
-    <main className="dashboard-content">
-      <div className="dashboard-intro">
+    <section className="dashboard-content">
+      <div className="page-heading">
         <div>
-          <span className="eyebrow">GESTÃO DE PRAZOS E ENTREGAS</span>
-
-          <h2>
-            Projetos<span className="title-dot">.</span>
-          </h2>
+          <span className="page-eyebrow">PORTFÓLIO E ACOMPANHAMENTO</span>
 
           <p>
-            Cadastre deadlines, repositórios vinculados e acompanhe entregas
-            pelo padrão semáforo.
+            Acompanhe prazos, responsáveis, progresso e sinais de risco dos
+            projetos monitorados pela plataforma.
           </p>
         </div>
 
-        <button className="primary-button" onClick={openCreateForm}>
+        <button type="button" className="primary-button">
           <Plus size={16} />
-          Novo Projeto
+          Novo projeto
         </button>
       </div>
 
-      <section className="panel elevation-1">
-        <div className="panel-heading">
-          <div>
-            <span className="section-kicker">
-              {safeProjects.length} PROJETOS CADASTRADOS
-            </span>
+      <div className="dashboard-grid three-columns">
+        <article className="metric-card elevation-1">
+          <span>Projetos ativos</span>
+          <strong>12</strong>
+          <small>Em acompanhamento</small>
+        </article>
 
-            <h2>Projetos em Andamento</h2>
-          </div>
-        </div>
+        <article className="metric-card elevation-1">
+          <span>Em atenção</span>
+          <strong>3</strong>
+          <small>Exigem acompanhamento</small>
+        </article>
 
-        {safeProjects.length === 0 ? (
-          <div
-            style={{
-              padding: '48px 20px',
-              color: 'var(--muted)',
-              textAlign: 'center',
-            }}
-          >
-            <Target size={38} style={{ marginBottom: '12px', opacity: 0.4 }} />
-            <p>Nenhum projeto cadastrado.</p>
+        <article className="metric-card elevation-1">
+          <span>Riscos críticos</span>
+          <strong>1</strong>
+          <small>Impacto potencial em prazo</small>
+        </article>
+      </div>
 
-            <button
-              className="primary-button"
-              style={{ marginTop: '16px' }}
-              onClick={openCreateForm}
-            >
-              <Plus size={16} />
-              Criar primeiro projeto
-            </button>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
-              gap: '20px',
-              padding: '16px',
-            }}
-          >
-            {safeProjects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                onClick={() => setSelectedProject(project)}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+      <div className="project-grid">
+        {projects.map((project) => (
+          <article className="project-card elevation-1" key={project.name}>
+            <div className="project-card-top">
+              <div className="project-icon">
+                <FolderKanban size={19} />
+              </div>
 
-      {showForm && (
-        <ProjectFormModal
-          project={editingProject}
-          onClose={() => {
-            setEditingProject(null)
-            setShowForm(false)
-          }}
-          onSave={saveProject}
-        />
-      )}
+              <span className={`status-badge ${project.status}`}>
+                {project.health}
+              </span>
+            </div>
 
-      {selectedProject && (
-        <ProjectDetailModal
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-          onEdit={() => openEditForm(selectedProject)}
-          onDelete={() => setShowDeleteConfirm(true)}
-        />
-      )}
+            <h3>{project.name}</h3>
 
-      {showDeleteConfirm && selectedProject && (
-        <DeleteProjectModal
-          project={selectedProject}
-          onClose={() => setShowDeleteConfirm(false)}
-          onConfirm={deleteProject}
-        />
-      )}
-    </main>
+            <div className="project-meta">
+              <span>
+                <Users size={15} />
+                {project.owner}
+              </span>
+
+              <span>
+                <CalendarClock size={15} />
+                {project.deadline}
+              </span>
+            </div>
+
+            <div className="project-progress">
+              <div>
+                <span>Progresso</span>
+                <strong>{project.progress}%</strong>
+              </div>
+
+              <div className="progress-track">
+                <span style={{ width: `${project.progress}%` }} />
+              </div>
+            </div>
+
+            {project.status === 'danger' && (
+              <div className="project-alert">
+                <CircleAlert size={15} />
+                Dependências pendentes podem afetar o prazo.
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+    </section>
   )
 }

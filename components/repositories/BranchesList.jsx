@@ -1,159 +1,151 @@
-import { useState } from 'react'
-import { GitBranch } from 'lucide-react'
+import {
+  GitBranch,
+  GitCommitHorizontal,
+  ShieldCheck,
+} from 'lucide-react'
 
-import { branches, services } from '../../data/mockData'
-import StatusBadge from '../common/StatusBadge'
-import BranchStat from './BranchStat'
+const branches = [
+  {
+    name: 'main',
+    repository: 'govtech-api',
+    author: 'Marina Costa',
+    lastCommit: 'a8f42c1',
+    updated: '12 min atrás',
+    protection: 'Protegida',
+    status: 'success',
+  },
+  {
+    name: 'develop',
+    repository: 'govtech-dashboard',
+    author: 'Ana Silva',
+    lastCommit: 'b21d4e9',
+    updated: '28 min atrás',
+    protection: 'Protegida',
+    status: 'success',
+  },
+  {
+    name: 'feature/audit-trail',
+    repository: 'governance-engine',
+    author: 'Carlos Melo',
+    lastCommit: 'c91f7d2',
+    updated: '3h atrás',
+    protection: 'Em revisão',
+    status: 'warning',
+  },
+  {
+    name: 'release/2.4',
+    repository: 'notification-service',
+    author: 'João Santos',
+    lastCommit: 'd65aa10',
+    updated: '1 dia atrás',
+    protection: 'Atenção',
+    status: 'danger',
+  },
+]
 
 export default function BranchesList() {
-  const [filterRepo, setFilterRepo] = useState('all')
-
-  const filteredBranches =
-    filterRepo === 'all'
-      ? branches
-      : branches.filter((branch) => branch.repository === filterRepo)
-
-  const branchStats = {
-    total: filteredBranches.length,
-    active: filteredBranches.filter((branch) => branch.status === 'active')
-      .length,
-    stale: filteredBranches.filter((branch) => branch.status === 'stale')
-      .length,
-  }
-
   return (
-    <section className="panel elevation-1">
-      <div className="panel-heading">
-        <div>
-          <span className="section-kicker">
-            {filterRepo === 'all'
-              ? 'TODOS OS REPOSITÓRIOS'
-              : filterRepo.toUpperCase()}
-          </span>
+    <>
+      <section className="metrics-grid">
+        <article className="metric-card elevation-1">
+          <div className="metric-icon">
+            <GitBranch size={19} />
+          </div>
 
-          <h2>Branches por Repositório</h2>
+          <div className="metric-content">
+            <span>Branches ativas</span>
+            <strong>31</strong>
+            <small>Em todos os repositórios</small>
+          </div>
+        </article>
+
+        <article className="metric-card elevation-1">
+          <div className="metric-icon">
+            <ShieldCheck size={19} />
+          </div>
+
+          <div className="metric-content">
+            <span>Branches protegidas</span>
+            <strong>14</strong>
+            <small>Com regras de aprovação</small>
+          </div>
+        </article>
+
+        <article className="metric-card elevation-1">
+          <div className="metric-icon">
+            <GitCommitHorizontal size={19} />
+          </div>
+
+          <div className="metric-content">
+            <span>Commits no período</span>
+            <strong>186</strong>
+            <small>Últimos 7 dias</small>
+          </div>
+        </article>
+      </section>
+
+      <section className="panel elevation-1">
+        <div className="panel-heading">
+          <div>
+            <span className="section-kicker">
+              FLUXO DE DESENVOLVIMENTO
+            </span>
+
+            <h2>Branches acompanhadas</h2>
+
+            <p>
+              Acompanhe branches ativas, proteção de fluxo e atualizações dos
+              repositórios.
+            </p>
+          </div>
         </div>
 
-        <select
-          value={filterRepo}
-          onChange={(event) => setFilterRepo(event.target.value)}
-          style={{
-            padding: '8px 12px',
-            border: '1px solid var(--border)',
-            borderRadius: '7px',
-            background: 'var(--surface)',
-            color: 'inherit',
-          }}
-        >
-          <option value="all">Todos os repositórios</option>
-
-          {services.map((service) => (
-            <option key={service.name} value={service.name}>
-              {service.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-          gap: '12px',
-          marginBottom: '24px',
-        }}
-      >
-        <BranchStat label="TOTAL" value={branchStats.total} />
-
-        <BranchStat
-          label="ATIVAS"
-          value={branchStats.active}
-          color="var(--color-success)"
-        />
-
-        <BranchStat
-          label="ABANDONADAS"
-          value={branchStats.stale}
-          color="var(--color-warning)"
-        />
-      </div>
-
-      {filterRepo !== 'all' && (
-        <div
-          style={{
-            marginBottom: '16px',
-            padding: '10px 12px',
-            borderRadius: '8px',
-            background: 'var(--color-primary-50)',
-            color: 'var(--color-primary-700)',
-            fontSize: '13px',
-          }}
-        >
-          Exibindo <strong>{branchStats.total}</strong> branch(es) do
-          repositório <strong>{filterRepo}</strong>.
-        </div>
-      )}
-
-      <div className="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>BRANCH</th>
-              <th>REPOSITÓRIO</th>
-              <th>ÚLTIMO COMMIT</th>
-              <th>COMMITS</th>
-              <th>AUTOR</th>
-              <th>STATUS</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredBranches.map((branch) => (
-              <tr key={`${branch.repository}-${branch.name}`}>
-                <td>
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '13px',
-                    }}
-                  >
-                    <GitBranch size={16} />
-                    {branch.name}
-                  </span>
-                </td>
-
-                <td>{branch.repository}</td>
-                <td>{branch.lastCommit}</td>
-                <td>{branch.commits}</td>
-                <td>{branch.author}</td>
-
-                <td>
-                  <StatusBadge
-                    status={branch.status === 'active' ? 'success' : 'warning'}
-                  >
-                    {branch.status === 'active' ? 'Ativa' : 'Abandonada'}
-                  </StatusBadge>
-                </td>
+        <div className="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>BRANCH</th>
+                <th>REPOSITÓRIO</th>
+                <th>RESPONSÁVEL</th>
+                <th>ÚLTIMO COMMIT</th>
+                <th>ATUALIZADA</th>
+                <th>STATUS</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
 
-      {filteredBranches.length === 0 && (
-        <div
-          style={{
-            padding: '32px',
-            color: 'var(--muted)',
-            textAlign: 'center',
-          }}
-        >
-          Nenhuma branch encontrada para este repositório.
+            <tbody>
+              {branches.map((branch) => (
+                <tr key={`${branch.repository}-${branch.name}`}>
+                  <td>
+                    <span className="inline-icon-text">
+                      <GitBranch size={15} />
+                      <strong>{branch.name}</strong>
+                    </span>
+                  </td>
+
+                  <td>{branch.repository}</td>
+
+                  <td>{branch.author}</td>
+
+                  <td>
+                    <span className="mono">
+                      {branch.lastCommit}
+                    </span>
+                  </td>
+
+                  <td>{branch.updated}</td>
+
+                  <td>
+                    <span className={`status-badge ${branch.status}`}>
+                      {branch.protection}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
-    </section>
+      </section>
+    </>
   )
 }

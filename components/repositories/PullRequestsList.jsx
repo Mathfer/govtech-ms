@@ -1,35 +1,107 @@
-import { useState } from 'react'
-import { ChevronRight } from 'lucide-react'
+import {
+  Clock3,
+  GitPullRequest,
+  MessageSquareText,
+  UserRound,
+} from 'lucide-react'
 
-import { pullRequests } from '../../data/mockData'
-import StatusBadge from '../common/StatusBadge'
-import PullRequestDetailModal from './PullRequestDetailModal'
-
-function getStatusLabel(status) {
-  const map = {
-    open: ['Aberta', 'warning'],
-    in_review: ['Em review', 'warning'],
-    approved: ['Aprovada', 'success'],
-    merged: ['Integrada', 'success'],
-    closed: ['Fechada', 'default'],
-  }
-
-  return map[status] || ['Aberta', 'warning']
-}
+const pullRequests = [
+  {
+    id: '#482',
+    title: 'Implementa indicadores de governança',
+    repository: 'govtech-dashboard',
+    author: 'Ana Silva',
+    reviewers: 2,
+    age: '2h',
+    status: 'Em revisão',
+    variant: 'warning',
+  },
+  {
+    id: '#479',
+    title: 'Adiciona trilha de auditoria',
+    repository: 'govtech-api',
+    author: 'Carlos Melo',
+    reviewers: 3,
+    age: '5h',
+    status: 'Aprovada',
+    variant: 'success',
+  },
+  {
+    id: '#476',
+    title: 'Ajusta alerta de pipeline',
+    repository: 'notification-service',
+    author: 'João Santos',
+    reviewers: 1,
+    age: '2 dias',
+    status: 'Atenção',
+    variant: 'danger',
+  },
+  {
+    id: '#471',
+    title: 'Refatora integração com GitHub',
+    repository: 'governance-engine',
+    author: 'Marina Costa',
+    reviewers: 2,
+    age: '1 dia',
+    status: 'Em revisão',
+    variant: 'warning',
+  },
+]
 
 export default function PullRequestsList() {
-  const [selectedPR, setSelectedPR] = useState(null)
-
   return (
     <>
+      <section className="metrics-grid">
+        <article className="metric-card elevation-1">
+          <div className="metric-icon">
+            <GitPullRequest size={19} />
+          </div>
+
+          <div className="metric-content">
+            <span>PRs abertas</span>
+            <strong>10</strong>
+            <small>Demandam acompanhamento</small>
+          </div>
+        </article>
+
+        <article className="metric-card elevation-1">
+          <div className="metric-icon">
+            <Clock3 size={19} />
+          </div>
+
+          <div className="metric-content">
+            <span>Tempo médio de revisão</span>
+            <strong>8h</strong>
+            <small>Últimos 30 dias</small>
+          </div>
+        </article>
+
+        <article className="metric-card elevation-1">
+          <div className="metric-icon">
+            <MessageSquareText size={19} />
+          </div>
+
+          <div className="metric-content">
+            <span>Aprovações pendentes</span>
+            <strong>4</strong>
+            <small>Requerem revisão</small>
+          </div>
+        </article>
+      </section>
+
       <section className="panel elevation-1">
         <div className="panel-heading">
           <div>
             <span className="section-kicker">
-              {pullRequests.length} PULL REQUESTS MONITORADAS
+              MONITORAMENTO DE ENTREGAS
             </span>
 
             <h2>Pull Requests</h2>
+
+            <p>
+              Solicitações de integração que exigem revisão, aprovação ou
+              acompanhamento da gestão.
+            </p>
           </div>
         </div>
 
@@ -37,71 +109,60 @@ export default function PullRequestsList() {
           <table>
             <thead>
               <tr>
-                <th>PR</th>
-                <th>TÍTULO</th>
-                <th>AUTOR</th>
+                <th>PULL REQUEST</th>
                 <th>REPOSITÓRIO</th>
-                <th>REVIEWERS</th>
-                <th>CRIADA</th>
+                <th>AUTOR</th>
+                <th>REVISORES</th>
+                <th>ABERTA HÁ</th>
                 <th>STATUS</th>
-                <th />
               </tr>
             </thead>
 
             <tbody>
-              {pullRequests.map((pr) => {
-                const [label, badge] = getStatusLabel(pr.status)
+              {pullRequests.map((pullRequest) => (
+                <tr key={pullRequest.id}>
+                  <td>
+                    <div className="service-name">
+                      <span className="avatar">
+                        <GitPullRequest size={15} />
+                      </span>
 
-                return (
-                  <tr
-                    key={pr.id}
-                    onClick={() => setSelectedPR(pr)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <td>
-                      <strong>#{pr.id}</strong>
-                    </td>
+                      <div>
+                        <b>
+                          {pullRequest.id} — {pullRequest.title}
+                        </b>
+                      </div>
+                    </div>
+                  </td>
 
-                    <td>
-                      <b>{pr.title}</b>
+                  <td className="mono">
+                    {pullRequest.repository}
+                  </td>
 
-                      <small
-                        style={{
-                          display: 'block',
-                          marginTop: '3px',
-                          color: 'var(--muted)',
-                        }}
-                      >
-                        {pr.labels.join(' · ')}
-                      </small>
-                    </td>
+                  <td>{pullRequest.author}</td>
 
-                    <td>{pr.author}</td>
-                    <td>{pr.repository}</td>
-                    <td>{pr.reviewers.length}</td>
-                    <td>{pr.createdAt}</td>
+                  <td>
+                    <span className="inline-icon-text">
+                      <UserRound size={15} />
+                      {pullRequest.reviewers}
+                    </span>
+                  </td>
 
-                    <td>
-                      <StatusBadge status={badge}>{label}</StatusBadge>
-                    </td>
+                  <td>{pullRequest.age}</td>
 
-                    <td>
-                      <ChevronRight size={16} />
-                    </td>
-                  </tr>
-                )
-              })}
+                  <td>
+                    <span
+                      className={`status-badge ${pullRequest.variant}`}
+                    >
+                      {pullRequest.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </section>
-
-      {selectedPR && (
-        <PullRequestDetailModal
-          pullRequest={selectedPR}
-          onClose={() => setSelectedPR(null)}
-        />
-      )}
     </>
   )
 }
